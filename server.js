@@ -179,7 +179,6 @@ app.post('/api/wallet_login', (req, res)=>{
   if (score > best) bucket[name] = score;
   saveData(data);
   res.json({ ok:true, best: bucket[name] });
-});
 
 app.get('/api/leaderboard', (req,res)=>{
   const data = loadData(); ensure30DayBucket(data);
