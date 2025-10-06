@@ -158,9 +158,6 @@ app.post('/api/wallet_login', (req, res)=>{
     console.error(e); res.status(500).json({error:'server'});
   }
 });
-app.post('/api/submit', requireAuth, (req,res)=>{
-  const { score, duration_ms } = req.body || {};
-  if (!Number.isFinite(score)) return res.status(400).json({error:'score required'});
   // Anti-cheat
   const MIN_MS_PER_POINT = Number(process.env.MIN_MS_PER_POINT || 30);
   const MAX_RATE_MS = Number(process.env.MAX_SUBMIT_RATE_MS || 3000);
