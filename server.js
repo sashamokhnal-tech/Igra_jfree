@@ -162,6 +162,7 @@ app.post('/api/wallet_login', (req, res)=>{
   const MIN_MS_PER_POINT = Number(process.env.MIN_MS_PER_POINT || 30);
   const MAX_RATE_MS = Number(process.env.MAX_SUBMIT_RATE_MS || 3000);
   const now = Date.now();
+  const { duration_ms, score } = req.body;
   if (!Number.isFinite(duration_ms) || duration_ms < score * MIN_MS_PER_POINT){
     return res.status(400).json({error:'invalid duration'});
   }
