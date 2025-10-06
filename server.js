@@ -43,8 +43,6 @@ const TIME_ZONE = CFG_TZ || 'America/Los_Angeles';
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-const DATA_PATH = path.join(__dirname, 'leaderboard.json');
-
 function loadData(){
   try { return JSON.parse(fs.readFileSync(DATA_PATH,'utf8')); }
   catch(e){ return { users:{}, scores:{}, lastReset:null, sessions:{} }; }
@@ -70,38 +68,6 @@ function ensure30DayBucket(data){
     saveData(data);
   }
 }
-
-// === Telegram auth verification (per docs) ===
-
-function requireAuth(req,res,next){
-  const auth = req.get('authorization')||'';
-  const m = auth.match(/^Bearer\s+([A-Za-z0-9_-]{16,})$/);
-  if (!m) return res.status(401).json({error:'Unauthorized'});
-  const token = m[1];
-  const data = loadData();
-  const sess = data.sessions && data.sessions[token];
-  if (!sess) return res.status(401).json({error:'Invalid session'});
-  req.user = sess;
-  next();
-}
-
-// === Routes ===
-    const data = loadData(); ensure30DayBucket(data);
-    const tgId = String(user.id);
-    const username = user.username ? `@${user.username}` : (user.first_name || 'Player');
-    // upsert user
-    data.users[tgId] = { id: tgId, username, first_name: user.first_name||'', last_name: user.last_name||'' };
-    // create short-lived token (rotate every login)
-    const token = crypto.randomBytes(24).toString('base64url');
-    if (!data.sessions) data.sessions = {};
-    data.sessions[token] = { id: tgId, username };
-    saveData(data);
-    res.json({ ok:true, token, username });
-  }catch(e){
-    res.status(500).json({error:'server'});
-  }
-});
-
 
 app.post('/api/guest_login', (req,res)=>{
   try{
